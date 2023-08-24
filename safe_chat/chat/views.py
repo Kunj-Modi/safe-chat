@@ -5,4 +5,4 @@ from django.shortcuts import render
 
 @login_required(login_url="/login/")
 def index(request):
-    return HttpResponse("Chat")
+    return HttpResponse("Chat<br><a href=\"/logout/\">Logout</a>")
