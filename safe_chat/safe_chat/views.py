@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -21,7 +20,7 @@ def login_page(request):
             return redirect("/login/")
         else:
             login(request, user)
-            return HttpResponse("Hello world!")
+            return redirect("/chat/")
 
     return render(request, "login.html")
 
