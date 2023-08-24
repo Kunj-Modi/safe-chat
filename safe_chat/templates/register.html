@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Safe Chat</title>
+</head>
+<body>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: red">{{ message }}</p>
+            <br>
+            <br>
+        {% endfor %}
+    {% endif %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <label>Username:</label><br>
+        <input type="text" name="username"><br>
+        <label>Password:</label><br>
+        <input type="password" name="password"><br>
+        <p>Already have account? <a href="/login/">Login</a></p>
+        <input type="submit">
+    </form>
+</body>
+</html>
