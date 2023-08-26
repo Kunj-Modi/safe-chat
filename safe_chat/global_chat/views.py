@@ -16,6 +16,9 @@ def index(request):
             message = GlobalChat.objects.create(user=user, user_message=user_message)
             return redirect("/global-chat/")
     chat = GlobalChat.objects.all().order_by("-message_time")[0:10]
+    if GlobalChat.objects.count() > 100:
+        ids_to_keep = GlobalChat.objects.order_by("-message_time")[:GlobalChat.objects.count() - 40].values_list("id", flat=True)
+        GlobalChat.objects.exclude(id__in=ids_to_keep).delete()
     context = {"user_massage": chat}
     return render(request, "global_chat.html", context=context)
 
