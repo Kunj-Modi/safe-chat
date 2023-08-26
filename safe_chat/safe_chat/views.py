@@ -23,14 +23,14 @@ def login_page(request):
             return redirect("/login/")
         else:
             login(request, user)
-            return redirect("/chat/")
+            return redirect("/chat-list/")
 
     return render(request, "login.html")
 
 
 def register(request):
     if request.user.is_authenticated:
-        return redirect("/chat/")
+        return redirect("/chat-list/")
 
     if request.method == "POST":
         username = request.POST.get("username")
