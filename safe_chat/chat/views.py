@@ -17,11 +17,8 @@ def index(request, sender_name):
     sender_id = User.objects.get(username=sender_name).id
     sent = ChatList.objects.filter(messageTo=user_id).filter(messageFrom=sender_id)
     received = ChatList.objects.filter(messageTo=sender_id).filter(messageFrom=user_id)
-    try:
-        time_diff = received[0].message_time - sent[0].message_time
-    except IndexError:
-        time_diff = 0
-    context = {"sent": sent, "received": received, "time_diff": time_diff, "sender_name": sender_name}
+    all_messages = (sent | received).order_by("message_time")
+    context = {"all_messages": all_messages, "sender_name": sender_name}
     return render(request, "chat.html", context=context)
 
 
@@ -33,15 +30,8 @@ def messages(request, sender_name):
     sender_id = User.objects.get(username=sender_name).id
     sent_query = ChatList.objects.filter(messageTo=user_id).filter(messageFrom=sender_id)
     received_query = ChatList.objects.filter(messageTo=sender_id).filter(messageFrom=user_id)
-    try:
-        time_diff = received_query[0].message_time - sent_query[0].message_time
-    except IndexError:
-        time_diff = 0
-    received = []
-    sent = []
-    for chat in received_query:
-        received.append(str(chat.user_message))
-    for chat in sent_query:
-        sent.append(str(chat.user_message))
-    results = [{"received": received, "sent": sent, "time_diff": time_diff}]
-    return JsonResponse(results, safe=False)
+    messages_query = (sent_query | received_query).order_by("message_time")
+    all_messages = []
+    for chat in messages_query:
+        all_messages.append([str(chat.messageTo), str(chat.user_message)])
+    return JsonResponse(all_messages, safe=False)

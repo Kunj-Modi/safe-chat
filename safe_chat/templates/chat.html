@@ -13,6 +13,21 @@
 
 {% block body %}
     <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary">
+        <div id="chatcontent">
+            {% for message in all_messages %}
+                {% if message.messageTo == request.user %}
+                    <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:blue;">{{message.user_message}}</span>
+                    </div>
+                {% else %}
+                    <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:green;">{{message.user_message}}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+
         <form class="p-3" method="post">
             {% csrf_token %}
             <div class="input-group mb-3">
@@ -20,70 +35,26 @@
               <button class="btn btn-outline-primary mt-2 bg-secondary-subtle" type="submit">Send</button>
             </div>
         </form>
-
-        <div id="chatcontent">
-            {% if time_diff > 0 %}
-                {% for message in received %}
-                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:green;">{{message.user_message}}</span>
-                    </div>
-                {% endfor %}
-                {% for message in sent %}
-                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:blue;">{{message.user_message}}</span>
-                    </div>
-                {% endfor %}
-            {% else %}
-                {% for message in sent %}
-                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:blue;">{{message.user_message}}</span>
-                    </div>
-                {% endfor %}
-                {% for message in received %}
-                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:green;">{{message.user_message}}</span>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
     </div>
+
 
     <script type="text/javascript">
         function updateMessages(){
             $.getJSON('/chat/messages/{{sender_name}}', function(rowz){
-                rowz = rowz[0];
                 $('#chatcontent').empty();
-                if (rowz.time_diff > 0)
+                for(var i = 0; i < rowz.length; i++)
                 {
-                    for (var i = 0; i < rowz.received.length; i++)
+                    arow = rowz[i];
+                    if (arow[0] == "{{ request.user }}")
                     {
-                        arow = rowz.received[i];
-                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:green;">${arow}</span>
+                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:blue;">${arow[1]}</span>
                             </div>`);
                     }
-                    for (var i = 0; i < rowz.sent.length; i++)
+                    else
                     {
-                        arow = rowz.sent[i];
-                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:blue;">${arow}</span>
-                            </div>`);
-                    }
-                }
-                else
-                {
-                    for (var i = 0; i < rowz.sent.length; i++)
-                    {
-                        arow = rowz.sent[i];
-                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:blue;">${arow}</span>
-                            </div>`);
-                    }
-                    for (var i = 0; i < rowz.received.length; i++)
-                    {
-                        arow = rowz.received[i];
-                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:green;">${arow}</span>
+                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:green;">${arow[1]}</span>
                             </div>`);
                     }
                 }
