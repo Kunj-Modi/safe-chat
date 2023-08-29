@@ -12,16 +12,16 @@
 {% endblock %}
 
 {% block body %}
-    <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary">
-        <div id="chatcontent">
+    <div class="col-8 mx-auto card mt-3 mb-3 shadow-lg border-primary">
+        <div data-bs-scroll="true" class="overflow-auto" id="chatcontent" style="height:65vh">
             {% for message in all_messages %}
                 {% if message.messageTo == request.user %}
                     <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:blue;">{{message.user_message}}</span>
+                        <span style="color:green;">{{message.user_message}}</span>
                     </div>
                 {% else %}
                     <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:green;">{{message.user_message}}</span>
+                        <span style="color:blue;">{{message.user_message}}</span>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -39,6 +39,11 @@
 
 
     <script type="text/javascript">
+        function scrollToBottom() {
+          var chatContent = document.getElementById("chatcontent");
+          chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
         function updateMessages(){
             $.getJSON('/chat/messages/{{sender_name}}', function(rowz){
                 $('#chatcontent').empty();
@@ -48,13 +53,13 @@
                     if (arow[0] == "{{ request.user }}")
                     {
                         $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:blue;">${arow[1]}</span>
+                                <span style="color:green;">${arow[1]}</span>
                             </div>`);
                     }
                     else
                     {
                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:green;">${arow[1]}</span>
+                                <span style="color:blue;">${arow[1]}</span>
                             </div>`);
                     }
                 }
@@ -65,6 +70,7 @@
         $(document).ready(function()
         {
             $.ajaxSetup({cache: false});
+            scrollToBottom();
             updateMessages();
         });
     </script>

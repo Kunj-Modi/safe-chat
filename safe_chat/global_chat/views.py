@@ -13,7 +13,7 @@ def index(request):
         user = request.user
         user_message = request.POST.get("user_message")
         if not user_message.strip() == "":
-            message = GlobalChat.objects.create(user=user, user_message=user_message)
+            GlobalChat.objects.create(user=user, user_message=user_message)
             return redirect("/global-chat/")
     chat = GlobalChat.objects.all().order_by("message_time")[0:10]
     if GlobalChat.objects.count() > 100:
