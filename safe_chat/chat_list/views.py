@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 
 from .models import ChatList
@@ -11,6 +11,10 @@ from .models import ChatList
 @login_required(login_url="/login/")
 def index(request):
     user = request.user
+    if request.method == "POST":
+        search = request.POST.get("search")
+        if User.objects.filter(username=search).exists():
+            return redirect(f"/chat/{search}")
     chats = ChatList.objects.filter(messageTo=user).order_by("-message_time").values("messageFrom")
     new_chats = []
     for chat in chats:
