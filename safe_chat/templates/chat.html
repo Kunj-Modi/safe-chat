@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} Global Chat {% endblock %}
+{% block title %} Chat - {{sender_name}} {% endblock %}
 
 {% block navbar %}
               <li class="nav-item">
@@ -13,9 +13,89 @@
 
 {% block body %}
     <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary">
+        <form class="p-3" method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <input type="text" name="user_message" class="form-control input-primary mt-2 border-primary bg-light" placeholder="Message" aria-describedby="button-addon2">
+              <button class="btn btn-outline-primary mt-2 bg-secondary-subtle" type="submit">Send</button>
+            </div>
+        </form>
+
+        <div id="chatcontent">
+            {% if time_diff > 0 %}
+                {% for message in received %}
+                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:green;">{{message.user_message}}</span>
+                    </div>
+                {% endfor %}
+                {% for message in sent %}
+                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:blue;">{{message.user_message}}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% for message in sent %}
+                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:blue;">{{message.user_message}}</span>
+                    </div>
+                {% endfor %}
+                {% for message in received %}
+                    <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:green;">{{message.user_message}}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 
     <script type="text/javascript">
+        function updateMessages(){
+            $.getJSON('/chat/messages/{{sender_name}}', function(rowz){
+                rowz = rowz[0];
+                $('#chatcontent').empty();
+                if (rowz.time_diff > 0)
+                {
+                    for (var i = 0; i < rowz.received.length; i++)
+                    {
+                        arow = rowz.received[i];
+                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:green;">${arow}</span>
+                            </div>`);
+                    }
+                    for (var i = 0; i < rowz.sent.length; i++)
+                    {
+                        arow = rowz.sent[i];
+                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:blue;">${arow}</span>
+                            </div>`);
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < rowz.sent.length; i++)
+                    {
+                        arow = rowz.sent[i];
+                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:blue;">${arow}</span>
+                            </div>`);
+                    }
+                    for (var i = 0; i < rowz.received.length; i++)
+                    {
+                        arow = rowz.received[i];
+                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:green;">${arow}</span>
+                            </div>`);
+                    }
+                }
+            });
+            setTimeout('updateMessages()', 5000);
+        }
+
+        $(document).ready(function()
+        {
+            $.ajaxSetup({cache: false});
+            updateMessages();
+        });
     </script>
 
 {% endblock %}

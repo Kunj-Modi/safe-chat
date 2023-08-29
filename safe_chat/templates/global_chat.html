@@ -36,7 +36,6 @@
     <script type="text/javascript">
         function updateMessages(){
             $.getJSON('/global-chat/messages', function(rowz){
-                console.log('JSON', rowz);
                 $('#chatcontent').empty();
                 for (var i = 0; i < rowz.length; i++)
                 {

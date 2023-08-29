@@ -12,10 +12,46 @@
 {% endblock %}
 
 {% block body %}
-    <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary">
+
+    <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary" id="search">
+        <form class="p-3" method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <input type="text" name="search" class="form-control input-primary mt-2 border-primary bg-light" placeholder="Search chat" aria-describedby="button-addon2">
+              <button class="btn btn-outline-primary mt-2 bg-secondary-subtle" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary p-3" id="chatcontent">
+        {% for chat in chats %}
+            <div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
+                <a href="/chat/{{chat}}"><span style="color:blue;">{{chat}}</span></a>
+            </div>
+        {% endfor %}
     </div>
 
     <script type="text/javascript">
+        function updateMessages(){
+            $.getJSON('/chat-list/messages', function(rowz){
+                console.log('JSON', rowz);
+                $('#chatcontent').empty();
+                for (var i = 0; i < rowz.length; i++)
+                {
+                    arow = rowz[i];
+                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
+                            <a href="/chat/${arow}"><span style="color:blue;">${arow}</span></a>
+                        </div>`);
+                }
+            });
+            setTimeout('updateMessages()', 5000);
+        }
+
+        $(document).ready(function()
+        {
+            $.ajaxSetup({cache: false});
+            updateMessages();
+        });
     </script>
 
 {% endblock %}
