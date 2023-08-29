@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %} Chat - {{sender_name}} {% endblock %}
+
+{% block navbar %}
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/chat-list/">Chat List</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/global-chat/">Global Chat</a>
+              </li>
+{% endblock %}
+
+{% block body %}
+    <div class="col-8 mx-auto card mt-3 mb-3 shadow-lg border-primary">
+        <div data-bs-scroll="true" class="overflow-auto" id="chatcontent" style="height:65vh">
+            {% for message in all_messages %}
+                {% if message.messageTo == request.user %}
+                    <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:green;">{{message.user_message}}</span>
+                    </div>
+                {% else %}
+                    <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                        <span style="color:blue;">{{message.user_message}}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+
+        <form class="p-3" method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <input type="text" name="user_message" class="form-control input-primary mt-2 border-primary bg-light" placeholder="Message" aria-describedby="button-addon2">
+              <button class="btn btn-outline-primary mt-2 bg-secondary-subtle" type="submit">Send</button>
+            </div>
+        </form>
+    </div>
+
+
+    <script type="text/javascript">
+        function scrollToBottom() {
+          var chatContent = document.getElementById("chatcontent");
+          chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
+        function updateMessages(){
+            $.getJSON('/chat/messages/{{sender_name}}', function(rowz){
+                $('#chatcontent').empty();
+                for(var i = 0; i < rowz.length; i++)
+                {
+                    arow = rowz[i];
+                    if (arow[0] == "{{ request.user }}")
+                    {
+                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:green;">${arow[1]}</span>
+                            </div>`);
+                    }
+                    else
+                    {
+                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                                <span style="color:blue;">${arow[1]}</span>
+                            </div>`);
+                    }
+                }
+            });
+            setTimeout('updateMessages()', 5000);
+        }
+
+        $(document).ready(function()
+        {
+            $.ajaxSetup({cache: false});
+            scrollToBottom();
+            updateMessages();
+        });
+    </script>
+
+{% endblock %}
