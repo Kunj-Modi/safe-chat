@@ -12,17 +12,10 @@
 {% endblock %}
 
 {% block body %}
-    <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary">
-        <form class="p-3" method="post">
-            {% csrf_token %}
-            <div class="input-group mb-3">
-              <input type="text" name="user_message" class="form-control input-primary mt-2 border-primary bg-light" placeholder="Message" aria-describedby="button-addon2">
-              <button class="btn btn-outline-primary mt-2 bg-secondary-subtle" type="submit">Send</button>
-            </div>
-        </form>
-        <div id="chatcontent">
+    <div class="col-8 mx-auto card mt-3 mb-3 shadow-lg border-primary">
+        <div data-bs-scroll="true" class="overflow-auto" id="chatcontent" style="height:65vh">
             {% for um in user_massage %}
-                <div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                <div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
                     {% if um.user == request.user %}
                         <span style="color:blue;">{{um.user}}:</span> &nbsp;&nbsp;&nbsp; {{ um }}
                     {% else %}
@@ -31,24 +24,37 @@
                 </div>
             {% endfor %}
         </div>
+
+        <form class="p-3" method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <input type="text" name="user_message" class="form-control input-primary mt-2 border-primary bg-light" placeholder="Message" aria-describedby="button-addon2">
+              <button class="btn btn-outline-primary mt-2 bg-secondary-subtle" type="submit">Send</button>
+            </div>
+        </form>
     </div>
 
     <script type="text/javascript">
+        function scrollToBottom() {
+          var chatContent = document.getElementById("chatcontent");
+          chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
         function updateMessages(){
             $.getJSON('/global-chat/messages', function(rowz){
                 $('#chatcontent').empty();
-                for (var i = 0; i < rowz.length; i++)
+                for (var i = rowz.length-1; i >= 0; i--)
                 {
                     arow = rowz[i];
                     if (arow[0] === arow[1])
                     {
-                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-primary bg-secondary-subtle" role="alert">
+                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
                             <span style="color:blue;">${arow[1]}:</span> &nbsp;&nbsp;&nbsp; ${arow[2]}
                         </div>`);
                     }
                     else
                     {
-                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto border-success bg-secondary-subtle" role="alert">
+                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-3 border-success bg-secondary-subtle" role="alert">
                             <span style="color:green;">${arow[1]}:</span> &nbsp;&nbsp;&nbsp; ${arow[2]}
                         </div>`);
                     }
@@ -61,6 +67,7 @@
         {
             $.ajaxSetup({cache: false});
             updateMessages();
+            scrollToBottom();
         });
     </script>
 
