@@ -15,7 +15,7 @@ def index(request):
         if not user_message.strip() == "":
             GlobalChat.objects.create(user=user, user_message=user_message)
             return redirect("/global-chat/")
-    chat = GlobalChat.objects.all().order_by("message_time")[0:10]
+    chat = GlobalChat.objects.all().order_by("message_time")[0:60]
     if GlobalChat.objects.count() > 100:
         ids_to_keep = GlobalChat.objects.order_by("-message_time")[:GlobalChat.objects.count() - 40].values_list("id", flat=True)
         GlobalChat.objects.exclude(id__in=ids_to_keep).delete()

@@ -23,7 +23,10 @@ def index(request, sender_name):
     sent = ChatList.objects.filter(messageTo=user_id).filter(messageFrom=sender_id)
     received = ChatList.objects.filter(messageTo=sender_id).filter(messageFrom=user_id)
     all_messages = (sent | received).order_by("message_time")
-    context = {"all_messages": all_messages, "sender_name": sender_name}
+    if all_messages.count() > 30:
+        ids_to_keep = all_messages.order_by("-message_time")[:all_messages.count() - 10].values_list("id", flat=True)
+        ChatList.objects.exclude(id__in=ids_to_keep).delete()
+    context = {"all_messages": all_messages[:20], "sender_name": sender_name}
     return render(request, "chat.html", context=context)
 
 
@@ -35,8 +38,9 @@ def messages(request, sender_name):
     sender_id = User.objects.get(username=sender_name).id
     received_query = ChatList.objects.filter(messageTo=user_id).filter(messageFrom=sender_id)
     sent_query = ChatList.objects.filter(messageTo=sender_id).filter(messageFrom=user_id)
-    messages_query = (sent_query | received_query).order_by("message_time")
+    messages_query = (sent_query | received_query).order_by("-message_time")[:20]
     all_messages = []
     for chat in messages_query:
         all_messages.append([str(chat.messageTo), str(chat.user_message)])
+    all_messages.reverse()
     return JsonResponse(all_messages, safe=False)
