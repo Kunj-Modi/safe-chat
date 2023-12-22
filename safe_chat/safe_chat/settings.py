@@ -19,12 +19,16 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    "daphne",
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'chat',
     'chat_list',
     'global_chat',
@@ -58,8 +62,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'safe_chat.wsgi.application'
+# WSGI_APPLICATION = 'safe_chat.wsgi.application'
+ASGI_APPLICATION = 'safe_chat.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
