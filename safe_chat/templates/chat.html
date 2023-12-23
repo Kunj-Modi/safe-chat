@@ -15,13 +15,13 @@
     <div class="col-8 mx-auto card mt-3 mb-3 shadow-lg border-primary">
         <div data-bs-scroll="true" class="overflow-auto" id="chatcontent" style="height:65vh">
             {% for message in all_messages %}
-                {% if message.messageTo == request.user %}
+                {% if message.from_user != request.user %}
                     <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:green;">{{message.user_message}}</span>
+                        <span style="color:green;">{{message.message}}</span>
                     </div>
                 {% else %}
                     <div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                        <span style="color:blue;">{{message.user_message}}</span>
+                        <span style="color:blue;">{{message.message}}</span>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -44,35 +44,36 @@
           chatContent.scrollTop = chatContent.scrollHeight;
         }
 
-        function updateMessages(){
-            $.getJSON('/chat/messages/{{sender_name}}', function(rowz){
-                $('#chatcontent').empty();
-                for(var i = 0; i < rowz.length; i++)
-                {
-                    arow = rowz[i];
-                    if (arow[0] == "{{ request.user }}")
-                    {
-                        $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:green;">${arow[1]}</span>
-                            </div>`);
-                    }
-                    else
-                    {
-                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-                                <span style="color:blue;">${arow[1]}</span>
-                            </div>`);
-                    }
-                }
-            });
-            setTimeout('updateMessages()', 5000);
-        }
+        scrollToBottom()
+        // function updateMessages(){
+        //     $.getJSON('/chat/messages/{{sender_name}}', function(rowz){
+        //         $('#chatcontent').empty();
+        //         for(var i = 0; i < rowz.length; i++)
+        //         {
+        //             arow = rowz[i];
+        //             if (arow[0] == "{{ request.user }}")
+        //             {
+        //                 $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+        //                         <span style="color:green;">${arow[1]}</span>
+        //                     </div>`);
+        //             }
+        //             else
+        //             {
+        //                $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+        //                         <span style="color:blue;">${arow[1]}</span>
+        //                     </div>`);
+        //             }
+        //         }
+        //     });
+        //     setTimeout('updateMessages()', 5000);
+        // }
 
-        $(document).ready(function()
-        {
-            $.ajaxSetup({cache: false});
-            scrollToBottom();
-            updateMessages();
-        });
+        // $(document).ready(function()
+        // {
+        //     $.ajaxSetup({cache: false});
+        //     scrollToBottom();
+        //     updateMessages();
+        // });
     </script>
 
 {% endblock %}

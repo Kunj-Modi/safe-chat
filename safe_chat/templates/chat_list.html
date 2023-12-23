@@ -32,26 +32,26 @@
     </div>
 
     <script type="text/javascript">
-        function updateMessages(){
-            $.getJSON('/chat-list/messages', function(rowz){
-                console.log('JSON', rowz);
-                $('#chatcontent').empty();
-                for (var i = 0; i < rowz.length; i++)
-                {
-                    arow = rowz[i];
-                       $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
-                            <a href="/chat/${arow}"><span style="color:blue;">${arow}</span></a>
-                        </div>`);
-                }
-            });
-            setTimeout('updateMessages()', 5000);
-        }
+        // function updateMessages(){
+        //     $.getJSON('/chat-list/messages', function(rowz){
+        //         console.log('JSON', rowz);
+        //         $('#chatcontent').empty();
+        //         for (var i = 0; i < rowz.length; i++)
+        //         {
+        //             arow = rowz[i];
+        //                $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
+        //                     <a href="/chat/${arow}"><span style="color:blue;">${arow}</span></a>
+        //                 </div>`);
+        //         }
+        //     });
+        //     setTimeout('updateMessages()', 5000);
+        // }
 
-        $(document).ready(function()
-        {
-            $.ajaxSetup({cache: false});
-            updateMessages();
-        });
+        // $(document).ready(function()
+        // {
+        //     $.ajaxSetup({cache: false});
+        //     updateMessages();
+        // });
     </script>
 
 {% endblock %}

@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 
 from .models import GlobalChat
