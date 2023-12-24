@@ -28,7 +28,7 @@
         </div>
 
 
-        <form class="p-3" method="post">
+        <form id="message_form" class="p-3" method="post">
             {% csrf_token %}
             <div class="input-group mb-3">
               <input type="text" name="user_message" class="form-control input-primary mt-2 border-primary bg-light" placeholder="Message" aria-describedby="button-addon2">
@@ -44,36 +44,40 @@
           chatContent.scrollTop = chatContent.scrollHeight;
         }
 
-        scrollToBottom()
-        // function updateMessages(){
-        //     $.getJSON('/chat/messages/{{sender_name}}', function(rowz){
-        //         $('#chatcontent').empty();
-        //         for(var i = 0; i < rowz.length; i++)
-        //         {
-        //             arow = rowz[i];
-        //             if (arow[0] == "{{ request.user }}")
-        //             {
-        //                 $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-        //                         <span style="color:green;">${arow[1]}</span>
-        //                     </div>`);
-        //             }
-        //             else
-        //             {
-        //                $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
-        //                         <span style="color:blue;">${arow[1]}</span>
-        //                     </div>`);
-        //             }
-        //         }
-        //     });
-        //     setTimeout('updateMessages()', 5000);
-        // }
+        scrollToBottom();
+        let user_name = "{{ user }}";
+        const socket = new WebSocket('ws://127.0.0.1:8000/chat/{{ sender_name }}');
+        socket.onopen = function(event) {
+            console.log('WebSocket connection opened.');
+        };
+        socket.onmessage = function(event) {
+            let data = JSON.parse(event.data);
+            if(data.type==='list_update'){
+                let color = "green";
+                if(data.from === user_name){color="blue"}
+                $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-4 border-primary bg-secondary-subtle" role="alert">
+                                        <span style="color:${color};">${data.message}</span>
+                                    </div>`);
+                scrollToBottom();
+            }
+            else{
+                console.log('Received message:', event.data);
+            }
+        };
+        socket.onclose = function(event) {
+            console.log('WebSocket connection closed.');
+        };
+        socket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
 
-        // $(document).ready(function()
-        // {
-        //     $.ajaxSetup({cache: false});
-        //     scrollToBottom();
-        //     updateMessages();
-        // });
+        let form = document.getElementById("message_form");
+        form.addEventListener("submit", (e)=>{
+            e.preventDefault();
+            let message = e.target.user_message.value;
+            socket.send(JSON.stringify({'message':message}));
+            form.reset();
+        })
     </script>
 
 {% endblock %}

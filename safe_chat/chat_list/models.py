@@ -37,3 +37,19 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Chat ID: {self.chat_id.chat_id}, From: {self.from_user.username}, Time: {self.message_time}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        group_name = f"group{self.chat_id.chat_id}"
+        print(group_name)
+        channel_layer = get_channel_layer()
+
+        if group_name in channel_layer.groups:
+            async_to_sync(channel_layer.group_send)(
+                group_name,
+                {
+                    'type': 'message',
+                    'from_user': self.from_user.username,
+                    'message': self.message,
+                }
+            )

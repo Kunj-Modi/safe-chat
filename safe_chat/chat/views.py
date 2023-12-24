@@ -1,10 +1,9 @@
-import time
-from datetime import timedelta, datetime
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
@@ -30,14 +29,3 @@ class Index(View):
 
         context = {"all_messages": messages, "sender_name": other}
         return render(request, "chat.html", context=context)
-
-    def post(self, request, other):
-        user = request.user
-        sender = User.objects.get(username=other)
-        chat_id = Chat.objects.get(Q(user1=user.id, user2=sender.id) | Q(user1=sender.id, user2=user.id))
-        user_message = request.POST.get("user_message").strip()
-        chat_id.last_message = datetime.now()
-        chat_id.save()
-        if user_message != "":
-            Message.objects.create(chat_id=chat_id, from_user=user, message=user_message)
-        return redirect(f"/chat/{other}")
