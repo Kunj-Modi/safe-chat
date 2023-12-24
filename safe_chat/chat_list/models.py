@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -10,6 +12,21 @@ class Chat(models.Model):
 
     def __str__(self):
         return f"Chat ID: {self.chat_id}, Users: {self.user1.username} - {self.user2.username}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        group_name = [self.user1.username, self.user2.username]
+        channel_layer = get_channel_layer()
+        for group in group_name:
+            if group in channel_layer.groups:
+                sender = self.user1.username if self.user1.username != group else self.user2.username
+                async_to_sync(channel_layer.group_send)(
+                    group,
+                    {
+                        'type': 'list_update',
+                        'sender': sender,
+                    }
+                )
 
 
 class Message(models.Model):

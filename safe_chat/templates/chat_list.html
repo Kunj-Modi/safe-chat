@@ -25,33 +25,35 @@
 
     <div class="col-8 mx-auto card mt-5 mb-5 shadow-lg border-primary p-3" id="chatcontent">
         {% for chat in chats %}
-            <div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
+            <div id="{{chat}}" class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
                 <a href="/chat/{{chat}}"><span style="color:blue;">{{chat}}</span></a>
             </div>
         {% endfor %}
     </div>
 
     <script type="text/javascript">
-        // function updateMessages(){
-        //     $.getJSON('/chat-list/messages', function(rowz){
-        //         console.log('JSON', rowz);
-        //         $('#chatcontent').empty();
-        //         for (var i = 0; i < rowz.length; i++)
-        //         {
-        //             arow = rowz[i];
-        //                $('#chatcontent').append(`<div class="alert alert-light col-11 mx-auto mt-3 border-primary bg-secondary-subtle" role="alert">
-        //                     <a href="/chat/${arow}"><span style="color:blue;">${arow}</span></a>
-        //                 </div>`);
-        //         }
-        //     });
-        //     setTimeout('updateMessages()', 5000);
-        // }
-
-        // $(document).ready(function()
-        // {
-        //     $.ajaxSetup({cache: false});
-        //     updateMessages();
-        // });
+        let user_name = "{{ user }}";
+        const socket = new WebSocket('ws://127.0.0.1:8000/list/');
+        socket.onopen = function(event) {
+            console.log('WebSocket connection opened.');
+        };
+        socket.onmessage = function(event) {
+            let data = JSON.parse(event.data);
+            if(data.type==='list_update'){
+                const sender = document.getElementById(data.sender);
+                const chatcontent = document.getElementById("chatcontent");
+                chatcontent.prepend(sender);
+            }
+            else{
+                console.log('Received message:', event.data);
+            }
+        };
+        socket.onclose = function(event) {
+            console.log('WebSocket connection closed.');
+        };
+        socket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
     </script>
 
 {% endblock %}
