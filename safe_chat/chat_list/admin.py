@@ -1,5 +1,6 @@
 from django.contrib import admin
 
-from .models import ChatList
+from .models import Chat, Message
 
-admin.site.register(ChatList)
+admin.site.register(Chat)
+admin.site.register(Message)
